@@ -1,0 +1,4 @@
+youtube-transcript-api>=1.2.0,<2
+yt-dlp>=2026.1.1
+faster-whisper>=1.2.0,<2
+av>=11,<17
