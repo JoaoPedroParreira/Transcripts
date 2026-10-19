@@ -134,6 +134,14 @@ Falta instalar a dependência. Executa: pip install -r requirements.txt|A depend
 Não foi possível identificar o vídeo neste link.|Could not identify a video in this link.|No se pudo identificar el vídeo en este enlace.|Impossible d’identifier la vidéo dans ce lien.|In diesem Link konnte kein Video erkannt werden.|Impossibile identificare il video in questo link.
 Verifica o link e o idioma.|Check the link and language.|Revisa el enlace y el idioma.|Vérifiez le lien et la langue.|Prüfe den Link und die Sprache.|Controlla il link e la lingua.
 `);
+addTranslations(`
+Transcreve no teu computador.|Transcribe on your computer.|Transcribe en tu ordenador.|Transcrivez sur votre ordinateur.|Transkribiere auf deinem Computer.|Trascrivi sul tuo computer.
+Esta versão online permite importar, pesquisar e exportar legendas. Para extrair de YouTube, TikTok ou Reels, descarrega a aplicação, extrai o ZIP e abre iniciar.bat (requer Python 3.10+).|This online version imports, searches and exports captions. To extract from YouTube, TikTok or Reels, download the app, extract the ZIP and open iniciar.bat (requires Python 3.10+).|Esta versión importa, busca y exporta subtítulos. Para extraer de YouTube, TikTok o Reels, descarga la aplicación, extrae el ZIP y abre iniciar.bat (requiere Python 3.10+).|Cette version importe, recherche et exporte les sous-titres. Pour extraire depuis YouTube, TikTok ou Reels, téléchargez l’application, extrayez le ZIP et ouvrez iniciar.bat (Python 3.10+ requis).|Diese Version importiert, durchsucht und exportiert Untertitel. Für YouTube, TikTok oder Reels lade die App herunter, entpacke die ZIP und öffne iniciar.bat (Python 3.10+ erforderlich).|Questa versione importa, cerca ed esporta sottotitoli. Per YouTube, TikTok o Reels, scarica l’app, estrai lo ZIP e apri iniciar.bat (richiede Python 3.10+).
+Descarregar aplicação ↓|Download app ↓|Descargar aplicación ↓|Télécharger l’application ↓|App herunterladen ↓|Scarica applicazione ↓
+Abrir aplicação local ↗|Open local app ↗|Abrir aplicación local ↗|Ouvrir l’application locale ↗|Lokale App öffnen ↗|Apri applicazione locale ↗
+Instruções de instalação ↗|Installation instructions ↗|Instrucciones de instalación ↗|Instructions d’installation ↗|Installationsanleitung ↗|Istruzioni di installazione ↗
+Para extrair deste link, inicia a aplicação local e abre o vídeo no teu computador.|To extract this link, start the local app and open the video on your computer.|Para extraer este enlace, inicia la aplicación local y abre el vídeo en tu ordenador.|Pour extraire ce lien, lancez l’application locale et ouvrez la vidéo sur votre ordinateur.|Starte die lokale App und öffne das Video auf deinem Computer, um diesen Link zu extrahieren.|Per estrarre questo link, avvia l’app locale e apri il video sul tuo computer.
+`);
 function t(text) { return translations[text]?.[siteLocale] || text; }
 const originalText = new WeakMap();
 const originalAttributes = new WeakMap();

@@ -54,6 +54,12 @@ function updateMetadata() {
 function setBusy(value) { busy = value; for (const id of ['extract','demo','import','language','url']) $(id).disabled = value; $('language').customControl?.setDisabled(value); $('extract').textContent = value ? t('A obter legendas…') : t('Extrair texto ↗'); }
 $('extract-form').addEventListener('submit', async event => {
   event.preventDefault(); if (busy) return;
+  if (isHostedSite()) {
+    updateLocalLink();
+    $('status').textContent=t('Para extrair deste link, inicia a aplicação local e abre o vídeo no teu computador.');
+    $('local-setup').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
   const social = /(?:tiktok\.com|instagram\.com)/i.test($('url').value);
   setBusy(true); $('status').textContent = social ? t('A obter e transcrever o áudio localmente. Pode demorar alguns minutos; na primeira vez é descarregado o modelo de voz (~150 MB). Mantém a página aberta.') : t('A consultar o YouTube a partir do teu computador…');
   try {
@@ -196,3 +202,24 @@ if (document.querySelectorAll) $('site-language').addEventListener('change', () 
   setBusy(busy);
   if (current) { render(); updateMetadata(); }
 });
+
+function isHostedSite() { return !['127.0.0.1','localhost','[::1]'].includes(location.hostname); }
+function updateLocalLink() {
+  const params=new URLSearchParams({url:$('url').value.trim(),language:$('language').value});
+  $('local-open').href='http://127.0.0.1:8765/#'+params.toString();
+}
+if (typeof location !== 'undefined') {
+  $('local-setup').hidden=!isHostedSite();
+  if (isHostedSite()) {
+    $('url').addEventListener('input',updateLocalLink);
+    $('language').addEventListener('change',updateLocalLink);
+    updateLocalLink();
+  } else if (location.hash.length > 1) {
+    const params=new URLSearchParams(location.hash.slice(1));
+    $('url').value=(params.get('url') || '').slice(0,2048);
+    const language=params.get('language');
+    if ([...$('language').options].some(option=>option.value===language)) $('language').value=language;
+    $('language').customControl?.refresh();
+    history.replaceState(null,'',location.pathname);
+  }
+}
