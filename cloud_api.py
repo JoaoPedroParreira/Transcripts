@@ -55,6 +55,14 @@ def transcript():
         with RATE_LOCK:
             RECENT.append(time.monotonic())
         host = (urlparse(url).hostname or '').lower()
+        if os.environ.get('TRANSCRIPT_PROVIDER') == 'supadata':
+            from provider_api import provider_transcript
+            if host in ('tiktok.com', 'www.tiktok.com', 'vm.tiktok.com', 'vt.tiktok.com', 'instagram.com', 'www.instagram.com'):
+                from social import source_url
+                source_url(url)
+                return jsonify(provider_transcript(url, language))
+            ident=video_id(url)
+            return jsonify(provider_transcript('https://www.youtube.com/watch?v='+ident,language,ident))
         if host in ('tiktok.com', 'www.tiktok.com', 'vm.tiktok.com', 'vt.tiktok.com', 'instagram.com', 'www.instagram.com'):
             from social import transcribe_social
             return jsonify(transcribe_social(url, language))
