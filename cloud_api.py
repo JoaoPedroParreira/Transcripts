@@ -71,9 +71,9 @@ def transcript():
         return jsonify(error=str(error)), 400
     except HTTPException:
         raise
-    except Exception:
+    except Exception as error:
         # Do not log URLs, caption contents, upstream tokens or request bodies.
-        return jsonify(error='A plataforma não disponibilizou este vídeo ao servidor gratuito. Pode exigir login, não ter legendas ou bloquear acessos de alojamentos. Experimenta outro vídeo ou importa SRT/VTT.'), 502
+        return jsonify(error='A plataforma não disponibilizou este vídeo ao servidor gratuito. Pode exigir login, não ter legendas ou bloquear acessos de alojamentos. Experimenta outro vídeo ou importa SRT/VTT.', errorCode=type(error).__name__), 502
     finally:
         ACTIVE.release()
 
