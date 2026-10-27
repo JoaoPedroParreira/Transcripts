@@ -26,9 +26,18 @@ Importar SRT/VTT, pesquisar, copiar e exportar funciona no navegador, sem enviar
 
 ## Publicação
 
-Interface: https://joaopedroparreira.github.io/Transcripts/
+Site: https://joaopedroparreira.github.io/Transcripts/
+API: https://fio-transcripts-api.onrender.com
 
-GitHub Pages publica a pasta `docs` do ramo `main`. Depois de editar `public`, executa `node build-pages.cjs` e envia as alterações. A versão online permite importar SRT/VTT, pesquisar, copiar e exportar sem servidor. A extração de links usa a aplicação local: o botão abre 127.0.0.1 com o vídeo no fragmento do endereço, que é removido ao abrir. Não há proxy, CORS remoto nem envio das transcrições para o GitHub. Cada utilizador precisa de instalar Python e iniciar a sua aplicação. O GitHub recebe pedidos normais dos ficheiros do site e as descargas do código, sujeitos às suas práticas de registos de alojamento.
+O GitHub Pages publica `docs/` do ramo `main`. Executa `node build-pages.cjs` depois de editar `public/`. A extração online fica na própria página: o navegador envia o link à API gratuita no Render e esta usa o plano Free da Supadata. Não exige computador local ligado.
+
+Supadata Free: 100 créditos/mês partilhados pelo site, sem cartão nem recarregamento automático. Obter legendas custa normalmente 1 crédito; geração de áudio custa 2 créditos/minuto. Ao esgotar, a extração para. O Render Free pode demorar cerca de um minuto a arrancar após inatividade e tem os seus limites de utilização. Nenhum plano pago foi ativado nesta configuração.
+
+O Fio não persiste vídeos nem transcrições. Os fornecedores podem manter os seus registos e cache de conteúdo público, como explicado na interface. Importação SRT/VTT, pesquisa e exportação continuam no navegador. A chave `SUPADATA_API_KEY` fica só nas variáveis privadas do Render. Nunca deve ser posta no GitHub, em `config.js` ou no navegador.
+
+Vídeos com várias faixas e sem identificação da língua original requerem escolher o idioma explicitamente: a Supadata não garante que a primeira faixa seja a original. Não devolvemos uma faixa arbitrária em deteção automática. Vídeos privados, restritos ou sem acesso pela plataforma podem falhar.
+
+Para desenvolvimento local continua disponível `iniciar.bat`; a versão local usa a ligação direta ao YouTube e o reconhecimento de voz instalado no computador.
 
 ## Idiomas
 

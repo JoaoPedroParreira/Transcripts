@@ -37,6 +37,13 @@ def provider_transcript(url, language, video_ident=None):
             else:
                 raise ProviderUnavailable('A transcrição demorou demasiado. Tenta um vídeo mais curto.')
     result_language = data.get('lang','')
+    if language == 'auto':
+        available = {code.lower().split('-')[0] for code in data.get('availableLangs',[]) if isinstance(code,str)}
+        if len(available) > 1:
+            # This provider returns the first available caption, not the original
+            # audio language, for dubbed videos. Never silently substitute it.
+            from youtube_tracks import AMBIGUOUS
+            raise ProviderUnavailable(AMBIGUOUS)
     if language != 'auto' and result_language.lower().split('-')[0] != language.lower().split('-')[0]:
         raise ProviderUnavailable('Não há legendas neste idioma. Experimenta a deteção automática.')
     content = data.get('content')

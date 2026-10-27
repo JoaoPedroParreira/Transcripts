@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
-const source = fs.readFileSync('public/i18n.js','utf8').replace('prepareLanguageOptions();','').replace('translatePage();','');
+const source = fs.readFileSync('public/i18n.js','utf8').replace('prepareLanguageOptions();','').replace('translatePage();','').replace('configureOnlineContent();','');
 const context = vm.createContext({Intl,navigator:{language:'vi-VN'},localStorage:{getItem:()=>null}});
 vm.runInContext(source,context);
 assert.equal(vm.runInContext('siteLocale',context),'en');

@@ -49,12 +49,12 @@ function show(data, title) {
 function updateMetadata() {
   if (!current) return;
   const data=current;
-  $('metadata').textContent = `${data.platform ? data.platform + ' · ' : ''}${data.language} · ${data.method === 'speech' ? t('Reconhecimento de voz local · pode conter erros') : data.generated ? t('Legendas automáticas') : t('Texto importado ou legendas manuais')}${data.videoId ? ' · ' + data.videoId : ''}`;
+  $('metadata').textContent = `${data.platform ? data.platform + ' · ' : ''}${data.language} · ${data.method === 'provider' ? t('Transcrição via Supadata') : data.method === 'speech' ? t('Reconhecimento de voz local · pode conter erros') : data.generated ? t('Legendas automáticas') : t('Texto importado ou legendas manuais')}${data.videoId ? ' · ' + data.videoId : ''}`;
 }
-function setBusy(value) { busy = value; for (const id of ['extract','demo','import','language','url']) $(id).disabled = value; $('language').customControl?.setDisabled(value); $('extract').textContent = value ? t('A obter legendas…') : t(typeof location !== 'undefined' && isHostedSite() ? 'Abrir no Fio local ↗' : 'Extrair texto ↗'); }
+function setBusy(value) { busy = value; for (const id of ['extract','demo','import','language','url']) $(id).disabled = value; $('language').customControl?.setDisabled(value); $('extract').textContent = value ? t('A obter legendas…') : t(typeof location !== 'undefined' && isHostedSite() && !remoteApiBase() ? 'Abrir no Fio local ↗' : 'Extrair texto ↗'); }
 $('extract-form').addEventListener('submit', async event => {
   event.preventDefault(); if (busy) return;
-  if (isHostedSite()) {
+  if (isHostedSite() && !remoteApiBase()) {
     updateLocalLink();
     window.open($('local-open').href,'_blank','noopener,noreferrer');
     $('status').textContent=t('Para extrair deste link, inicia a aplicação local e abre o vídeo no teu computador.');
@@ -64,7 +64,15 @@ $('extract-form').addEventListener('submit', async event => {
   const social = /(?:tiktok\.com|instagram\.com)/i.test($('url').value);
   setBusy(true); $('status').textContent = social ? t('A obter e transcrever o áudio localmente. Pode demorar alguns minutos; na primeira vez é descarregado o modelo de voz (~150 MB). Mantém a página aberta.') : t('A consultar o YouTube a partir do teu computador…');
   try {
-    const response = await fetch('/api/transcript', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:$('url').value.trim(),language:$('language').value}),signal:AbortSignal.timeout(social ? 1800000 : 90000)});
+    const base=remoteApiBase();
+    if (base) {
+      $('status').textContent=t('A ligar ao serviço gratuito. A primeira ligação pode demorar cerca de um minuto…');
+      const health=await fetch(base+'/health',{signal:AbortSignal.timeout(120000),credentials:'omit'});
+      if (!health.ok) throw new Error(t('O serviço gratuito está indisponível. Tenta novamente dentro de alguns minutos.'));
+      $('status').textContent=t('A processar o vídeo no serviço gratuito. Mantém esta página aberta…');
+    }
+    const response = await fetch(base+'/api/transcript', {method:'POST',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:$('url').value.trim(),language:$('language').value}),signal:AbortSignal.timeout(base ? 600000 : social ? 1800000 : 90000)});
+    if (!response.headers.get('Content-Type')?.includes('application/json')) throw new Error(t('O serviço gratuito está indisponível. Tenta novamente dentro de alguns minutos.'));
     const data = await response.json(); if (!response.ok) throw new Error(data.error || t('Não foi possível obter a transcrição.'));
     if (!data.segments?.length) throw new Error(t('Não foi encontrado texto neste vídeo.'));
     $('status').textContent = ''; show(data,t('A tua transcrição'));
@@ -205,13 +213,18 @@ if (document.querySelectorAll) $('site-language').addEventListener('change', () 
 });
 
 function isHostedSite() { return !['127.0.0.1','localhost','[::1]'].includes(location.hostname); }
+function remoteApiBase() {
+  if (typeof location === 'undefined' || !isHostedSite()) return '';
+  const base=window.FIO_API_BASE || '';
+  return /^https:\/\/[a-z0-9-]+\.onrender\.com$/.test(base) ? base : '';
+}
 function updateLocalLink() {
   const params=new URLSearchParams({url:$('url').value.trim(),language:$('language').value});
   $('local-open').href='http://127.0.0.1:8765/#'+params.toString();
 }
 if (typeof location !== 'undefined') {
-  $('local-setup').hidden=!isHostedSite();
-  if (isHostedSite()) {
+  $('local-setup').hidden=!isHostedSite() || !!remoteApiBase();
+  if (isHostedSite() && !remoteApiBase()) {
     $('extract').textContent=t('Abrir no Fio local ↗');
     $('url').addEventListener('input',updateLocalLink);
     $('language').addEventListener('change',updateLocalLink);

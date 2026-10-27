@@ -27,6 +27,13 @@ class ProviderTests(unittest.TestCase):
                 provider_transcript('https://www.youtube.com/watch?v=7P_4cFZrjqI','pt')
 
     @patch.dict(os.environ,{'SUPADATA_API_KEY':'unit-test-only'})
+    def test_ambiguous_auto_tracks_do_not_return_english(self):
+        with patch('provider_api.requests.Session') as session:
+            session.return_value.__enter__.return_value.get.return_value=response(200,{'lang':'en','availableLangs':['en','pt','es'],'content':[{'text':'English','offset':0,'duration':1000}]})
+            with self.assertRaisesRegex(ProviderUnavailable,'original'):
+                provider_transcript('https://www.youtube.com/watch?v=7P_4cFZrjqI','auto')
+
+    @patch.dict(os.environ,{'SUPADATA_API_KEY':'unit-test-only'})
     def test_job_completion_and_no_paid_retry(self):
         with patch('provider_api.requests.Session') as session,patch('provider_api.time.sleep'):
             client=session.return_value.__enter__.return_value

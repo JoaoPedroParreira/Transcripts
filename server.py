@@ -46,6 +46,8 @@ class Handler(BaseHTTPRequestHandler):
             entry = ('theme.js', 'text/javascript; charset=utf-8')
         if self.path == '/i18n.js':
             entry = ('i18n.js', 'text/javascript; charset=utf-8')
+        if self.path == '/config.js':
+            entry = ('config.js', 'text/javascript; charset=utf-8')
         if not entry:
             return self.reply(404, {'error': 'Não encontrado.'})
         self.reply(200, (ROOT / entry[0]).read_bytes(), entry[1])
