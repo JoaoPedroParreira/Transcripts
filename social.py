@@ -1,12 +1,14 @@
 """Local speech recognition. Downloaded media stays in memory."""
 import io
+import os
 import threading
 from pathlib import Path
 from urllib.parse import urlparse
 
 LOCK = threading.Lock()
 MODEL = None
-MAX_BYTES = 80 * 1024 * 1024
+MAX_BYTES = int(os.environ.get('MAX_MEDIA_BYTES', 80 * 1024 * 1024))
+MAX_SECONDS = int(os.environ.get('MAX_VIDEO_SECONDS', 600))
 
 def source_url(value):
     url = urlparse(value.strip())
@@ -40,8 +42,8 @@ def transcribe_social(value, language):
             info = downloader.extract_info(url, download=False)
         if not info or info.get('_type') in ('playlist', 'multi_video'):
             raise ValueError('Cola o link de um único vídeo público.')
-        if not info.get('duration') or info['duration'] > 600:
-            raise ValueError('A transcrição local suporta vídeos com duração conhecida até 10 minutos.')
+        if not info.get('duration') or info['duration'] > MAX_SECONDS:
+            raise ValueError(f'Este serviço suporta vídeos até {MAX_SECONDS // 60} minutos para transcrição de voz.')
         media_url = info.get('url', '')
         if urlparse(media_url).scheme != 'https':
             raise ValueError('Não foi possível obter o áudio deste vídeo.')
@@ -50,12 +52,12 @@ def transcribe_social(value, language):
                 response.raise_for_status()
                 for chunk in response.iter_content(65536):
                     if audio.tell() + len(chunk) > MAX_BYTES:
-                        raise ValueError('O vídeo ultrapassa o limite de 80 MB. Experimenta um vídeo mais curto.')
+                        raise ValueError('O vídeo ultrapassa o limite de tamanho. Experimenta um vídeo mais curto.')
                     audio.write(chunk)
             audio.seek(0)
             global MODEL
             if MODEL is None:
-                MODEL = WhisperModel('base', device='cpu', compute_type='int8', download_root=str(Path(__file__).parent / '.models'))
+                MODEL = WhisperModel(os.environ.get('WHISPER_MODEL', 'base'), device='cpu', compute_type='int8', cpu_threads=1, num_workers=1, download_root=str(Path(__file__).parent / '.models'))
             segments, detected = MODEL.transcribe(audio, language=None if language == 'auto' else language, vad_filter=True, beam_size=3)
             result = [{'start': s.start, 'duration': max(0, s.end - s.start), 'text': s.text.strip()} for s in segments if s.text.strip()]
         if not result:
