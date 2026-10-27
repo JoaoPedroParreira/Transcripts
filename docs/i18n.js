@@ -142,6 +142,7 @@ Abrir aplicação local ↗|Open local app ↗|Abrir aplicación local ↗|Ouvri
 Instruções de instalação ↗|Installation instructions ↗|Instrucciones de instalación ↗|Instructions d’installation ↗|Installationsanleitung ↗|Istruzioni di installazione ↗
 Para extrair deste link, inicia a aplicação local e abre o vídeo no teu computador.|To extract this link, start the local app and open the video on your computer.|Para extraer este enlace, inicia la aplicación local y abre el vídeo en tu ordenador.|Pour extraire ce lien, lancez l’application locale et ouvrez la vidéo sur votre ordinateur.|Starte die lokale App und öffne das Video auf deinem Computer, um diesen Link zu extrahieren.|Per estrarre questo link, avvia l’app locale e apri il video sul tuo computer.
 `);
+addTranslations(`Abrir no Fio local ↗|Open in local Fio ↗|Abrir en Fio local ↗|Ouvrir dans Fio local ↗|In lokalem Fio öffnen ↗|Apri in Fio locale ↗`);
 function t(text) { return translations[text]?.[siteLocale] || text; }
 const originalText = new WeakMap();
 const originalAttributes = new WeakMap();

@@ -51,11 +51,12 @@ function updateMetadata() {
   const data=current;
   $('metadata').textContent = `${data.platform ? data.platform + ' · ' : ''}${data.language} · ${data.method === 'speech' ? t('Reconhecimento de voz local · pode conter erros') : data.generated ? t('Legendas automáticas') : t('Texto importado ou legendas manuais')}${data.videoId ? ' · ' + data.videoId : ''}`;
 }
-function setBusy(value) { busy = value; for (const id of ['extract','demo','import','language','url']) $(id).disabled = value; $('language').customControl?.setDisabled(value); $('extract').textContent = value ? t('A obter legendas…') : t('Extrair texto ↗'); }
+function setBusy(value) { busy = value; for (const id of ['extract','demo','import','language','url']) $(id).disabled = value; $('language').customControl?.setDisabled(value); $('extract').textContent = value ? t('A obter legendas…') : t(typeof location !== 'undefined' && isHostedSite() ? 'Abrir no Fio local ↗' : 'Extrair texto ↗'); }
 $('extract-form').addEventListener('submit', async event => {
   event.preventDefault(); if (busy) return;
   if (isHostedSite()) {
     updateLocalLink();
+    window.open($('local-open').href,'_blank','noopener,noreferrer');
     $('status').textContent=t('Para extrair deste link, inicia a aplicação local e abre o vídeo no teu computador.');
     $('local-setup').scrollIntoView({behavior:'smooth',block:'center'});
     return;
@@ -211,6 +212,7 @@ function updateLocalLink() {
 if (typeof location !== 'undefined') {
   $('local-setup').hidden=!isHostedSite();
   if (isHostedSite()) {
+    $('extract').textContent=t('Abrir no Fio local ↗');
     $('url').addEventListener('input',updateLocalLink);
     $('language').addEventListener('change',updateLocalLink);
     updateLocalLink();

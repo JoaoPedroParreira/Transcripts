@@ -1,12 +1,8 @@
 @echo off
 cd /d "%~dp0"
-where python >nul 2>nul
-if errorlevel 1 (
-  echo Instala Python 3.10 ou superior e ativa a opcao Add Python to PATH.
-  pause
-  exit /b 1
-)
 if not exist .venv\Scripts\python.exe (
+  where python >nul 2>nul
+  if errorlevel 1 goto sempython
   python -m venv .venv
   if errorlevel 1 goto erro
 )
@@ -19,6 +15,10 @@ start "" http://127.0.0.1:8765
 .venv\Scripts\python.exe -B server.py
 pause
 exit /b
+:sempython
+echo Instala Python 3.10 ou superior e ativa a opcao Add Python to PATH.
+pause
+exit /b 1
 :erro
 echo Nao foi possivel preparar o Python ou instalar as dependencias.
 pause
